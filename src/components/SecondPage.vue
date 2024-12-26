@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed, defineEmits, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { nanoid } from 'nanoid'
 import type { GridRoom, PossiblePosition } from '@/types/Avatar'
+import WindowSvg from '@/components/WindowIconFromAbove.vue'
 
 const emit = defineEmits(['changePage'])
 function changePage() {
@@ -90,8 +91,7 @@ function joinAndCompareGridSlots(
         .trim()
         .toLowerCase() === expectedValues.slice(2).join('').toLowerCase() &&
       ((gridSlots[0].innerValue === 'גל' && gridSlots[1].innerValue === 'רן') ||
-        gridSlots[0].innerValue === 'רן' &&
-        gridSlots[1].innerValue === 'גל')
+        (gridSlots[0].innerValue === 'רן' && gridSlots[1].innerValue === 'גל'))
     )
   }
   return (
@@ -132,8 +132,9 @@ function developerFunctionFillAllExpectedValues() {
     <div class="row">
       <div class="grid">
         <div class="window-wrapper">
-          <span>חלון</span>
-          <span>חלון</span>
+          <!-- <WindowSvg /> -->
+          <WindowSvg />
+          <WindowSvg />
         </div>
         <div v-for="(slot, i) in gridTopLeft" :key="slot.id" class="grid-slot">
           <input
@@ -145,8 +146,8 @@ function developerFunctionFillAllExpectedValues() {
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <span>חלון</span>
-          <span>חלון</span>
+          <WindowSvg />
+          <WindowSvg />
         </div>
         <div v-for="(slot, i) in gridTopMidLeft" :key="slot.id" class="grid-slot">
           <input
@@ -158,8 +159,8 @@ function developerFunctionFillAllExpectedValues() {
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <span>חלון</span>
-          <span>חלון</span>
+          <WindowSvg />
+          <WindowSvg />
         </div>
         <div v-for="(slot, i) in gridTopMidRight" :key="slot.id" class="grid-slot">
           <input
@@ -171,8 +172,8 @@ function developerFunctionFillAllExpectedValues() {
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <span>חלון</span>
-          <span>חלון</span>
+          <WindowSvg />
+          <WindowSvg />
         </div>
         <div v-for="(slot, i) in gridTopRight" :key="slot.id" class="grid-slot">
           <input
@@ -187,8 +188,8 @@ function developerFunctionFillAllExpectedValues() {
       <div class="row-left">
         <div class="grid">
           <div class="window-wrapper">
-            <span>חלון</span>
-            <span>חלון</span>
+            <WindowSvg />
+            <WindowSvg />
           </div>
           <div v-for="(slot, i) in gridMidLeft" :key="slot.id" class="grid-slot">
             <input
@@ -200,8 +201,8 @@ function developerFunctionFillAllExpectedValues() {
         </div>
         <div class="grid" style="padding: 40px 20px 20px 80px">
           <div class="window-wrapper">
-            <span>חלון</span>
-            <span>חלון</span>
+            <WindowSvg />
+            <WindowSvg />
           </div>
           <div class="coffee-wrapper">
             <span>קפה</span>

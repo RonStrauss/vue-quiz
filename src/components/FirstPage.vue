@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineEmits } from 'vue'
 import CustomButton from './CustomButton.vue'
 
 const emit = defineEmits(['changePage'])
