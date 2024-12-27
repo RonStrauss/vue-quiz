@@ -14,7 +14,7 @@ function handleChangePage(newPage: typeof currentPage.value) {
 const title = computed(() => {
   switch (currentPage.value) {
     case '0':
-      return 'החידה הגדולה'
+      return 'SaaS Platformania'
     case '1':
       return 'SaaS Platform mish-mash'
     case '2':
