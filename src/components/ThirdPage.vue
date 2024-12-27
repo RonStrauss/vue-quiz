@@ -80,7 +80,9 @@ section {
   gap: 14px;
 }
 .img-wrapper .bottom input {
-  width: 3rem;
+  width: 4rem;
+  padding:16px;
   text-align: center;
+  font-size:x-large;
 }
 </style>
