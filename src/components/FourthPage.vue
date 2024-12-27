@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import type { Icons } from '@/types/Icons'
 import CustomIconSvg from './CustomIconSvg.vue'
+import { ref } from 'vue'
 
 const emit = defineEmits(['changePage'])
 function changePage() {
   emit('changePage', '4')
 }
 
-const expectedColor = '#ff5c4f'
+const expectedColor = '#FD5C4E'
 
 const legendIcons: Array<{ code: string; icon: Icons }> = [
   {
@@ -76,23 +77,50 @@ const legendIcons: Array<{ code: string; icon: Icons }> = [
   },
 ]
 
-const questions = [
-  'הלקוח הכי גדול של BMC Helix רכש 620k execitions',
-  'השנים שניר עובד ב BMC זהות לשנים שמעיין קנטור חיה',
-  'רן הוא העובד הכי חדש בקבוצה',
-  'כיום יש x פלטפורמות בכל חשבונות פרודקשן',
-  'הנר השמיני בחנוכייה נקרא "שמש" ומשתמשים בו כדי להדליק את שאר הנרות',
-  'חברת BMC פועלת במעל ל 50 מדינות בעולם ',
+const questions: Array<{ q: string; t: Icons; f: Icons }> = [
+  { q: 'הלקוח הכי גדול של BMC Helix רכש 620k execitions', t: 'temperature-full', f: 'filter' },
+  { q: 'השנים שניר עובד ב BMC זהות לשנים שמעיין קנטור חיה', t: 'cruzeiro-sign', f: 'hurricane-alt' },
+  { q: 'רן הוא העובד הכי חדש בקבוצה', t: 'hashtag', f: 'overline' },
+  { q: 'כיום יש x פלטפורמות בכל חשבונות פרודקשן', t: 'clock-eight', f: 'cube-alt-2' },
+  {
+    q: 'הנר השמיני בחנוכייה נקרא "שמש" ומשתמשים בו כדי להדליק את שאר הנרות',
+    t: 'sigma',
+    f: 'lock-alt',
+  },
+  { q: 'חברת BMC פועלת במעל ל 50 מדינות בעולם ', t: 'cube-alt-2', f: 'hourglass' },
 ]
+
+const selectedAnswers = ref(Array(questions.length).fill(null))
 </script>
 
 <template>
   <div class="flex">
     <div class="flex-right">
       <div class="question" v-for="(question, index) in questions" :key="index">
-        <div class="left">
-          <label>{{ question }}</label>
-          <div class="right"><button>נכון</button><button>לא נכון</button></div>
+        <p>{{ question.q }}</p>
+        <div class="buttons">
+          <label>
+            <input
+              type="radio"
+              :name="'question' + index"
+              value="true"
+              v-model="selectedAnswers[index]"
+            />
+            נכון
+          </label>
+          <label>
+            <input
+              type="radio"
+              :name="'question' + index"
+              value="false"
+              v-model="selectedAnswers[index]"
+            />
+            לא נכון
+          </label>
+          <CustomIconSvg
+            v-if="selectedAnswers[index] !== null"
+            :src="selectedAnswers[index] === 'true' ? question.t : question.f"
+          />
         </div>
       </div>
     </div>
@@ -123,15 +151,15 @@ const questions = [
   gap: 1rem;
 }
 .answer input {
-width: 150px;
-height: 75px;
+  width: 150px;
+  height: 75px;
 }
 .flex-left {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.question {
+.question .buttons {
   display: flex;
   gap: 1rem;
 }
@@ -144,7 +172,7 @@ height: 75px;
   display: flex;
   gap: 0.5rem;
 }
-button {
+label {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   background-color: #f0f0f0;
