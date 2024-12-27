@@ -1,69 +1,86 @@
 <script setup lang="ts">
-import type { GridItem } from '@/types/GridItem'
-import { nanoid } from 'nanoid'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const emit = defineEmits(['changePage'])
 function changePage() {
-  emit('changePage', '2')
+  emit('changePage', '3')
 }
 
-const counter = ref(0)
+const expectedValue = '3429'
+const inputs = ref(['', '', '', ''])
+const concatenatedInputs = computed(() => inputs.value.join(''))
 
-const grid1 = ref<GridItem[]>(
-  [
-    { orientation: 'portrait', src: getDummyPictureUrl(), id: nanoid(), isClicked: false },
-    { orientation: 'portrait', src: getDummyPictureUrl(), id: nanoid(), isClicked: false },
-    { orientation: 'portrait', src: getDummyPictureUrl(), id: nanoid(), isClicked: false },
-    { orientation: 'landscape', src: getDummyPictureUrl(), id: nanoid(), isClicked: false },
-  ],
-  // .map((g: GridItem): GridItem => ({ ...g, isClicked: false, id: nanoid() })),
-)
-
-function getDummyPictureUrl() {
-  return `https://i.pravatar.cc/50?img=${counter.value++ + 1}`
-}
+watch(concatenatedInputs, (newVal) => {
+  if (newVal === expectedValue) {
+    changePage()
+  }
+})
 </script>
 
 <template>
-  <main>
-    <div class="grid">
-      <div class="grid-slot" v-for="slot of grid1" :key="slot.id">
-        <img
-          :src="slot.src"
-          alt="Avatar"
-          @click="slot.isClicked = !slot.isClicked"
-          :class="{ rotated: slot.orientation === 'landscape' }"
-        />
+  <section dir="ltr">
+    <div class="img-wrapper">
+      <div class="top">
+        <h2>Rockets 2</h2>
+        <img src="@/assets/images/rockets2.jpg" alt="rockets2" />
+      </div>
+      <div class="bottom">
+        <input v-model="inputs[0]" type="text" />
       </div>
     </div>
-    <div class="grid"></div>
-    <div class="grid"></div>
-    <div class="grid"></div>
-  </main>
+    <div class="img-wrapper">
+      <div class="top">
+        <h2>Rockets 3 + Falcon 3</h2>
+        <img src="@/assets/images/rockets3_falcon3.jpg" alt="rockets3_falcon3" />
+      </div>
+      <div class="bottom">
+        <input v-model="inputs[1]" type="text" />
+      </div>
+    </div>
+    <div class="img-wrapper">
+      <div class="top">
+        <h2>Falcon 2</h2>
+        <img src="@/assets/images/falcon2.jpg" alt="falcon2" />
+      </div>
+      <div class="bottom">
+        <input v-model="inputs[2]" type="text" />
+      </div>
+    </div>
+    <div class="img-wrapper">
+      <div class="top">
+        <h2>Rockets 1 + SRE + Managers</h2>
+        <img src="@/assets/images/rockets1_sre_managers.jpg" alt="rockets1_sre_managers" />
+      </div>
+      <div class="bottom">
+        <input v-model="inputs[3]" type="text" />
+      </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
-main{
+section {
   display: flex;
 }
-.grid {
-  display: grid;
-  /* grid-template-columns: repeat(3, 1fr); */
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.grid-slot {
-  width: 50px;
-  height: 100px;
-  border: 1px solid #ccc;
+.img-wrapper {
+  width: 25%;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
 }
-
-.grid-slot img.rotated {
-  transform: rotate(90deg);
+.img-wrapper img {
+  width: 100%;
+}
+.img-wrapper .top {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+.img-wrapper .bottom input {
+  width: 3rem;
+  text-align: center;
 }
 </style>

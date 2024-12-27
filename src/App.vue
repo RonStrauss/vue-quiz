@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-const currentPage = ref<'0' | '1' | '2' | '3' | '4'>('0')
 import FirstPage from './components/FirstPage.vue'
 import SecondPage from './components/SecondPage.vue'
 import ThirdPage from './components/ThirdPage.vue'
+import FourthPage from './components/FourthPage.vue'
+
+const currentPage = ref<'0' | '1' | '2' | '3' | '4'>('0')
 
 function handleChangePage(newPage: typeof currentPage.value) {
   currentPage.value = newPage
@@ -17,6 +19,8 @@ const title = computed(() => {
       return 'SaaS Platform mish-mash'
     case '2':
       return 'החידה השלישית'
+    case '3':
+      return 'החידה הרביעית'
     default:
       return 'הסוף'
   }
@@ -24,12 +28,16 @@ const title = computed(() => {
 </script>
 
 <template>
-  <header>{{title}}</header>
+  <header>{{ title }}</header>
 
   <main dir="rtl">
     <FirstPage v-if="currentPage === '0'" @change-page="handleChangePage" />
     <SecondPage v-else-if="currentPage === '1'" @change-page="handleChangePage" />
     <ThirdPage v-else-if="currentPage === '2'" @change-page="handleChangePage" />
+    <FourthPage v-else-if="currentPage === '3'" @change-page="handleChangePage" />
+    <button @click="() => handleChangePage('1')">SecondPage</button>
+    <button  @click="() => handleChangePage('2')">ThirdPage</button>
+    <button  @click="() => handleChangePage('3')">FourthPage</button>
   </main>
 </template>
 

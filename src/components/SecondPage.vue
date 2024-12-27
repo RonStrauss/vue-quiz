@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { nanoid } from 'nanoid'
 import type { GridRoom, PossiblePosition } from '@/types/Avatar'
-import WindowSvg from '@/components/WindowIconFromAbove.vue'
+import CustomIconSvg from '@/components/CustomIconSvg.vue'
 
 const emit = defineEmits(['changePage'])
 function changePage() {
@@ -19,6 +19,15 @@ const expectedValues = {
   gridBottomLeft: ['מעיין', 'רון', 'אנאן', 'מעיין קנטור'],
 }
 
+const initialState = {
+  gridTopLeft: ['', 'עמית', '', 'מקסים'],
+  gridTopMidLeft: ['', 'יניב', 'נועה', ''],
+  gridTopMidRight: ['', '', 'שלו', 'אולג', 'ולרי'],
+  gridTopRight: ['', 'נוי', 'רפאל', ''],
+  gridMidLeft: ['שלי', '', 'אדיר', 'ויקה', 'עדי'],
+  gridBottomLeft: ['', 'רון', '', 'מעיין קנטור'],
+}
+
 const areInputsCorrect = computed(() => {
   return (
     joinAndCompareGridSlots(gridTopLeft.value, expectedValues.gridTopLeft) &&
@@ -29,12 +38,12 @@ const areInputsCorrect = computed(() => {
     joinAndCompareGridSlots(gridBottomLeft.value, expectedValues.gridBottomLeft)
   )
 })
-const gridTopLeft = ref<GridRoom[]>(getEmptyGridSlots(4))
-const gridTopMidLeft = ref<GridRoom[]>(getEmptyGridSlots(4))
-const gridTopMidRight = ref<GridRoom[]>(getEmptyGridSlots(5))
-const gridTopRight = ref<GridRoom[]>(getEmptyGridSlots(4))
-const gridMidLeft = ref<GridRoom[]>(getEmptyGridSlots(5))
-const gridBottomLeft = ref<GridRoom[]>(getEmptyGridSlots(4))
+const gridTopLeft = ref<GridRoom[]>(getInitialStateArray('gridTopLeft'))
+const gridTopMidLeft = ref<GridRoom[]>(getInitialStateArray('gridTopMidLeft'))
+const gridTopMidRight = ref<GridRoom[]>(getInitialStateArray('gridTopMidRight'))
+const gridTopRight = ref<GridRoom[]>(getInitialStateArray('gridTopRight'))
+const gridMidLeft = ref<GridRoom[]>(getInitialStateArray('gridMidLeft'))
+const gridBottomLeft = ref<GridRoom[]>(getInitialStateArray('gridBottomLeft'))
 
 watch(areInputsCorrect, (newVal) => {
   if (newVal) {
@@ -73,8 +82,12 @@ function changeValuesInGridSlots(e: Event, i: number, position: PossiblePosition
   ]
 }
 
-function getEmptyGridSlots(length: number) {
-  return new Array(length).fill({ id: nanoid(), innerValue: '' })
+function getInitialStateArray(key: keyof typeof initialState) {
+  return initialState[key].map((name) => ({
+    id: nanoid(),
+    innerValue: name,
+    readonly: name !== '',
+  }))
 }
 
 function joinAndCompareGridSlots(
@@ -82,48 +95,60 @@ function joinAndCompareGridSlots(
   expectedValues: string[],
   isSpecialCase = false,
 ) {
+  let grid = gridSlots,
+    expected = expectedValues
+
   if (isSpecialCase) {
-    return (
-      gridSlots
-        .slice(2)
-        .map((slot) => slot.innerValue)
-        .join('')
-        .trim()
-        .toLowerCase() === expectedValues.slice(2).join('').toLowerCase() &&
-      ((gridSlots[0].innerValue === 'גל' && gridSlots[1].innerValue === 'רן') ||
-        (gridSlots[0].innerValue === 'רן' && gridSlots[1].innerValue === 'גל'))
-    )
+    grid = grid.slice(2)
+    expected = expected.slice(2)
   }
-  return (
-    gridSlots
+  let expression =
+    grid
       .map((slot) => slot.innerValue)
       .join('')
       .trim()
-      .toLowerCase() === expectedValues.join('').toLowerCase()
-  )
+      .toLowerCase() === expected.join('').toLowerCase()
+
+  if (isSpecialCase) {
+    expression &&=
+      (gridSlots[0].innerValue === 'גל' && gridSlots[1].innerValue === 'רן') ||
+      (gridSlots[0].innerValue === 'רן' && gridSlots[1].innerValue === 'גל')
+  }
+
+  return expression
 }
 
 function developerFunctionFillAllExpectedValues() {
-  gridTopLeft.value = expectedValues.gridTopLeft.map((name) => ({ id: nanoid(), innerValue: name }))
+  gridTopLeft.value = expectedValues.gridTopLeft.map((name) => ({
+    id: nanoid(),
+    readonly: false,
+    innerValue: name,
+  }))
   gridTopMidLeft.value = expectedValues.gridTopMidLeft.map((name) => ({
     id: nanoid(),
+    readonly: false,
     innerValue: name,
   }))
   gridTopMidRight.value = expectedValues.gridTopMidRight.map((name) => ({
     id: nanoid(),
     innerValue: name,
+    readonly: false,
   }))
   gridTopRight.value = expectedValues.gridTopRight.map((name) => ({
     id: nanoid(),
     innerValue: name,
+    readonly: false,
   }))
-  gridMidLeft.value = expectedValues.gridMidLeft.map((name) => ({ id: nanoid(), innerValue: name }))
-  gridBottomLeft.value = expectedValues.gridBottomLeft.map((name) => ({
+  gridMidLeft.value = expectedValues.gridMidLeft.map((name) => ({
     id: nanoid(),
     innerValue: name,
+    readonly: false,
   }))
-
-  // console.log({ gridTopLeft, gridTopMidLeft, gridTopMidRight, gridTopRight, gridMidLeft, gridBottomLeft });
+  gridBottomLeft.value = expectedValues.gridBottomLeft.map((name) => ({
+    id: nanoid(),
+    readonly: false,
+    innerValue: name,
+  }))
 }
 </script>
 
@@ -132,88 +157,100 @@ function developerFunctionFillAllExpectedValues() {
     <div class="row">
       <div class="grid">
         <div class="window-wrapper">
-          <!-- <WindowSvg /> -->
-          <WindowSvg />
-          <WindowSvg />
+          <CustomIconSvg src="window" />
+          <CustomIconSvg src="window" />
         </div>
-        <div v-for="(slot, i) in gridTopLeft" :key="slot.id" class="grid-slot">
-          <input
-            type="text"
-            :value="slot.innerValue"
-            @input="(e) => changeValuesInGridSlots(e, i, 'TopLeft')"
-          />
-        </div>
+        <input
+          v-for="(slot, i) in gridTopLeft"
+          :key="slot.id"
+          class="grid-slot"
+          type="text"
+          :value="slot.innerValue"
+          :readonly="slot.readonly"
+          @input="(e) => changeValuesInGridSlots(e, i, 'TopLeft')"
+        />
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <WindowSvg />
-          <WindowSvg />
+          <CustomIconSvg src="window" />
+          <CustomIconSvg src="window" />
         </div>
-        <div v-for="(slot, i) in gridTopMidLeft" :key="slot.id" class="grid-slot">
-          <input
-            type="text"
-            :value="slot.innerValue"
-            @input="(e) => changeValuesInGridSlots(e, i, 'TopMidLeft')"
-          />
-        </div>
+        <input
+          v-for="(slot, i) in gridTopMidLeft"
+          :key="slot.id"
+          class="grid-slot"
+          type="text"
+          :value="slot.innerValue"
+          :readonly="slot.readonly"
+          @input="(e) => changeValuesInGridSlots(e, i, 'TopMidLeft')"
+        />
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <WindowSvg />
-          <WindowSvg />
+          <CustomIconSvg src="window" />
+          <CustomIconSvg src="window" />
         </div>
-        <div v-for="(slot, i) in gridTopMidRight" :key="slot.id" class="grid-slot">
-          <input
-            type="text"
-            :value="slot.innerValue"
-            @input="(e) => changeValuesInGridSlots(e, i, 'TopMidRight')"
-          />
-        </div>
+        <input
+          v-for="(slot, i) in gridTopMidRight"
+          :key="slot.id"
+          class="grid-slot"
+          type="text"
+          :value="slot.innerValue"
+          :readonly="slot.readonly"
+          @input="(e) => changeValuesInGridSlots(e, i, 'TopMidRight')"
+        />
       </div>
       <div class="grid">
         <div class="window-wrapper">
-          <WindowSvg />
-          <WindowSvg />
+          <CustomIconSvg src="window" />
+          <CustomIconSvg src="window" />
         </div>
-        <div v-for="(slot, i) in gridTopRight" :key="slot.id" class="grid-slot">
-          <input
-            type="text"
-            :value="slot.innerValue"
-            @input="(e) => changeValuesInGridSlots(e, i, 'TopRight')"
-          />
-        </div>
+        <input
+          v-for="(slot, i) in gridTopRight"
+          :key="slot.id"
+          class="grid-slot"
+          type="text"
+          :value="slot.innerValue"
+          :readonly="slot.readonly"
+          @input="(e) => changeValuesInGridSlots(e, i, 'TopRight')"
+        />
       </div>
     </div>
     <div class="row">
       <div class="row-left">
         <div class="grid">
           <div class="window-wrapper">
-            <WindowSvg />
-            <WindowSvg />
+            <CustomIconSvg src="window" />
+            <CustomIconSvg src="window" />
           </div>
-          <div v-for="(slot, i) in gridMidLeft" :key="slot.id" class="grid-slot">
-            <input
-              type="text"
-              :value="slot.innerValue"
-              @input="(e) => changeValuesInGridSlots(e, i, 'MidLeft')"
-            />
-          </div>
+          <input
+            v-for="(slot, i) in gridMidLeft"
+            :key="slot.id"
+            class="grid-slot"
+            type="text"
+            :value="slot.innerValue"
+            :readonly="slot.readonly"
+            @input="(e) => changeValuesInGridSlots(e, i, 'MidLeft')"
+          />
         </div>
         <div class="grid" style="padding: 40px 20px 20px 80px">
           <div class="window-wrapper">
-            <WindowSvg />
-            <WindowSvg />
+            <CustomIconSvg src="window" />
+            <CustomIconSvg src="window" />
           </div>
           <div class="coffee-wrapper">
-            <span>קפה</span>
+            <!-- <span>קפה</span> -->
+            <CustomIconSvg src="coffee-machine" />
           </div>
-          <div v-for="(slot, i) in gridBottomLeft" :key="slot.id" class="grid-slot">
-            <input
-              type="text"
-              :value="slot.innerValue"
-              @input="(e) => changeValuesInGridSlots(e, i, 'BottomLeft')"
-            />
-          </div>
+          <input
+            v-for="(slot, i) in gridBottomLeft"
+            :key="slot.id"
+            class="grid-slot"
+            type="text"
+            :value="slot.innerValue"
+            :readonly="slot.readonly"
+            @input="(e) => changeValuesInGridSlots(e, i, 'BottomLeft')"
+          />
         </div>
       </div>
       <div class="row-right">
@@ -259,30 +296,34 @@ function developerFunctionFillAllExpectedValues() {
   position: relative;
   grid-template-columns: repeat(2, 1fr);
   place-items: center;
-  /* direction: rtl; */
   gap: 20px;
-  background-color: rgb(108, 255, 255);
+  background: url('@/assets/images/parquet.jpg');
+  background-size: cover;
   padding: 40px 20px 20px;
+  background-color: rgb(171 255 255);
+  background-blend-mode: darken;
 }
 .grid-slot {
   width: 100px;
   height: 40px;
   border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
-.grid-slot img {
-  width: 100%;
-  height: 100%;
-}
-
+/*
 .grid-slot input {
   width: 100%;
   height: 100%;
   border: none;
   outline: none;
-  text-align: center;
+} */
+.grid-slot:read-only {
+  background-color: #7d7d7d;
+  color: white;
 }
 
 .window-wrapper {

@@ -1,4 +1,4 @@
-export type GridRoom = { innerValue: string; id: string }
+export type GridRoom = { innerValue: string; readonly: boolean; id: string }
 
 export type PossiblePosition =
   | 'TopLeft'
