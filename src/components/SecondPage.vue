@@ -257,7 +257,7 @@ function developerFunctionFillAllExpectedValues() {
       </div>
       <div class="row-right">
         <div class="text">
-          <p>אילוצים:</p>
+          <p>רמזים:</p>
           <ol>
             <li v-for="(instruction, i) in instructions" :key="i">{{ instruction }}</li>
           </ol>
