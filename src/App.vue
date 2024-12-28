@@ -28,10 +28,32 @@ const title = computed(() => {
       return 'ניצחתם!'
   }
 })
+
+const instructions = computed(() => {
+  switch (currentPage.value) {
+    case '0':
+      return ''
+    case '1':
+      return `  בואו ניקח את שיתוף הפעולה צעד אחד קדימה. החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות במקומות
+    המתאימים להם כדי לעבור לשלב הבא.`
+    case '2':
+      return `כדי לעבור לחידה הבאה תצטרכו קוד בין 4 ספרות, שאותו החבאתי בתמונות הילדות שלכם.
+זה הזמן להשתמש בדפי העזר והטושים שקיבלתם.
+אם תצטרכו עוד, שמרתי קצת בצד אצל מעיין.`
+    case '3':
+      return `איך אני אוהב לפענח כתב סתרים.
+עכשיו נראה אתכם מסתדרים בלעדיי`
+    default:
+      return `חפשו את הנרות מתחת לשולחן המרצה 😁`
+  }
+})
 </script>
 
 <template>
-  <header>{{ title }}</header>
+  <header>
+    <h1 class="title">{{ title }}</h1>
+    <h3 class="instructions">{{ instructions }}</h3>
+  </header>
 
   <main dir="rtl">
     <FirstPage v-if="currentPage === '0'" @change-page="handleChangePage" />
@@ -51,11 +73,16 @@ const title = computed(() => {
 <style scoped>
 header {
   text-align: center;
-  font-size: x-large;
+  direction: rtl;
+  text-wrap: balance;
 }
 main {
   display: grid;
   place-items: center;
   flex: 1;
+}
+
+.title {
+  font-size: x-large;
 }
 </style>
