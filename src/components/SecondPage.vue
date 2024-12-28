@@ -155,6 +155,10 @@ function developerFunctionFillAllExpectedValues() {
 </script>
 
 <template>
+  <h3>
+    בואו ניקח את שיתוף הפעולה צעד אחד קדימה. החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות במקומות
+    המתאימים להם כדי לעבור לשלב הבא.
+  </h3>
   <div class="wrapper">
     <div class="row">
       <div class="grid">
@@ -257,10 +261,6 @@ function developerFunctionFillAllExpectedValues() {
       </div>
       <div class="row-right">
         <div class="text">
-          <p>
-            בואו ניקח את שיתוף הפעולה צעד אחד קדימה. החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות
-            במקומות המתאימים להם כדי לעבור לשלב הבא.
-          </p>
           <p>
             בואו נעשה קצת בלגן!!! החלטתי לערבב את כל החדרים. עכשיו זה הזמן לארגון מחדש. אבל אתם לא
             חושבים שזה יהיה כל כך קל...
