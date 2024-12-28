@@ -1,4 +1,17 @@
-export type GridRoom = { innerValue: string; readonly: boolean; id: string }
+import type { Ref } from 'vue'
+
+export type GridRoom = {
+  innerValue: string
+  id: string
+} & (
+  | {
+      readonly: false
+      list: Ref<{ name: string }[]>
+    }
+  | {
+      readonly: true
+    }
+)
 
 export type PossiblePosition =
   | 'TopLeft'

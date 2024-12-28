@@ -1,8 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { nanoid } from 'nanoid'
-import type { GridRoom, PossiblePosition } from '@/types/Avatar'
+import type { GridRoom } from '@/types/Avatar'
 import CustomIconSvg from '@/components/CustomIconSvg.vue'
+import draggable from 'vuedraggable'
+import { type SortableEvent } from 'sortablejs'
+
+type NameList = {
+  name: string
+}
 
 const emit = defineEmits(['changePage'])
 function changePage() {
@@ -20,24 +26,60 @@ const expectedValues = {
   gridMidLeft: ['שלי', 'דין', 'אדיר', 'ויקה', 'עדי'],
   gridBottomLeft: ['מעיין', 'רון', 'אנאן', 'מעיין קנטור'],
 }
+const list1 = ref<NameList[]>(
+  [
+    { name: 'מיכאל' },
+    { name: 'ליאור' },
+    { name: 'ניר' },
+    { name: 'ולריה' },
+    { name: 'רן' },
+    { name: 'גל' },
+    { name: 'רומן SRE' },
+    { name: 'רומן devops' },
+    { name: 'דין' },
+    { name: 'מעיין' },
+    { name: 'אנאן' },
+  ].sort(() => Math.random() - 0.5),
+)
+const nameLists = {
+  list2: ref<NameList[]>([]),
+  list3: ref<NameList[]>([]),
+  list4: ref<NameList[]>([]),
+  list5: ref<NameList[]>([]),
+  list6: ref<NameList[]>([]),
+  list7: ref<NameList[]>([]),
+  list8: ref<NameList[]>([]),
+  list9: ref<NameList[]>([]),
+  list10: ref<NameList[]>([]),
+  list11: ref<NameList[]>([]),
+  list12: ref<NameList[]>([]),
+}
 
 const initialState = {
-  gridTopLeft: ['', 'עמית', '', 'מקסים'],
-  gridTopMidLeft: ['', 'יניב', 'נועה', ''],
-  gridTopMidRight: ['', '', 'שלו', 'אולג', 'ולרי'],
-  gridTopRight: ['', 'נוי', 'רפאל', ''],
-  gridMidLeft: ['שלי', '', 'אדיר', 'ויקה', 'עדי'],
-  gridBottomLeft: ['', 'רון', '', 'מעיין קנטור'],
+  gridTopLeft: ['list2', 'עמית', 'list3', 'מקסים'],
+  gridTopMidLeft: ['list4', 'יניב', 'נועה', 'list5'],
+  gridTopMidRight: ['list6', 'list7', 'שלו', 'אולג', 'ולרי'],
+  gridTopRight: ['list8', 'נוי', 'רפאל', 'list9'],
+  gridMidLeft: ['שלי', 'list10', 'אדיר', 'ויקה', 'עדי'],
+  gridBottomLeft: ['list11', 'רון', 'list12', 'מעיין קנטור'],
 }
 
 const areInputsCorrect = computed(() => {
+  const { list2, list3, list4, list5, list6, list7, list8, list9, list10, list11, list12 } =
+    nameLists
   return (
-    joinAndCompareGridSlots(gridTopLeft.value, expectedValues.gridTopLeft) &&
-    joinAndCompareGridSlots(gridTopMidLeft.value, expectedValues.gridTopMidLeft) &&
-    joinAndCompareGridSlots(gridTopMidRight.value, expectedValues.gridTopMidRight, true) &&
-    joinAndCompareGridSlots(gridTopRight.value, expectedValues.gridTopRight) &&
-    joinAndCompareGridSlots(gridMidLeft.value, expectedValues.gridMidLeft) &&
-    joinAndCompareGridSlots(gridBottomLeft.value, expectedValues.gridBottomLeft)
+    list2.value[0]?.name === expectedValues.gridTopLeft[0] &&
+    list3.value[0]?.name === expectedValues.gridTopLeft[2] &&
+    list4.value[0]?.name === expectedValues.gridTopMidLeft[0] &&
+    list5.value[0]?.name === expectedValues.gridTopMidLeft[3] &&
+    // handle special case for gridTopMidRight
+    ((list6.value[0]?.name === 'גל' && list7.value[0]?.name === 'רן') ||
+      (list6.value[0]?.name === 'רן' && list7.value[0]?.name === 'גל')) &&
+    list8.value[0]?.name === expectedValues.gridTopRight[0] &&
+    list9.value[0]?.name === expectedValues.gridTopRight[3] &&
+    list10.value[0]?.name === expectedValues.gridMidLeft[1] &&
+    list11.value[0]?.name === expectedValues.gridBottomLeft[0] &&
+    list12.value[0]?.name === expectedValues.gridBottomLeft[2]
   )
 })
 const gridTopLeft = ref<GridRoom[]>(getInitialStateArray('gridTopLeft'))
@@ -52,105 +94,36 @@ watch(areInputsCorrect, (newVal) => {
     changePage()
   }
 })
-function changeValuesInGridSlots(e: Event, i: number, position: PossiblePosition) {
-  let grid = gridTopLeft
-  switch (position) {
-    case 'TopLeft':
-      grid = gridTopLeft
-      break
-    case 'TopMidLeft':
-      grid = gridTopMidLeft
-      break
-    case 'TopMidRight':
-      grid = gridTopMidRight
-      break
-    case 'TopRight':
-      grid = gridTopRight
-      break
-    case 'MidLeft':
-      grid = gridMidLeft
-      break
-    case 'BottomLeft':
-      grid = gridBottomLeft
-      break
-    default:
-      break
-  }
-  const gridSlot = grid.value[i]
-  grid.value = [
-    ...grid.value.slice(0, i),
-    { ...gridSlot, innerValue: (e.target as HTMLInputElement).value },
-    ...grid.value.slice(i + 1),
-  ]
+
+function getInitialStateArray(key: keyof typeof initialState): GridRoom[] {
+  return initialState[key].map((name) => {
+    const gridItem: GridRoom = {
+      id: nanoid(),
+      innerValue: name,
+      readonly: true,
+    }
+    if (name.includes('list')) {
+      const typesafeName = name as keyof typeof nameLists
+      return { ...gridItem, readonly: false, list: nameLists[typesafeName] }
+    }
+    return gridItem
+  })
 }
 
-function getInitialStateArray(key: keyof typeof initialState) {
-  return initialState[key].map((name) => ({
-    id: nanoid(),
-    innerValue: name,
-    readonly: name !== '',
-  }))
-}
+function developerFunctionFillAllExpectedValues() {}
 
-function joinAndCompareGridSlots(
-  gridSlots: GridRoom[],
-  expectedValues: string[],
-  isSpecialCase = false,
-) {
-  let grid = gridSlots,
-    expected = expectedValues
-
-  if (isSpecialCase) {
-    grid = grid.slice(2)
-    expected = expected.slice(2)
+function onAdd(e: SortableEvent) {
+  if (e.to.children.length > 1) {
+    const destinationList = e.to.dataset.listId as keyof typeof nameLists
+    const sourceList = e.from.dataset.listId as keyof typeof nameLists | 'list1'
+    const element = nameLists[destinationList].value[e.newIndex ?? 0]
+    nameLists[destinationList].value.splice(e.newIndex ?? 0, 1)
+    if (sourceList === 'list1') {
+      list1.value.push(element)
+      return
+    }
+    nameLists[sourceList].value.push(element)
   }
-  let expression =
-    grid
-      .map((slot) => slot.innerValue)
-      .join('')
-      .trim()
-      .toLowerCase() === expected.join('').toLowerCase()
-
-  if (isSpecialCase) {
-    expression &&=
-      (gridSlots[0].innerValue === 'גל' && gridSlots[1].innerValue === 'רן') ||
-      (gridSlots[0].innerValue === 'רן' && gridSlots[1].innerValue === 'גל')
-  }
-
-  return expression
-}
-
-function developerFunctionFillAllExpectedValues() {
-  gridTopLeft.value = expectedValues.gridTopLeft.map((name) => ({
-    id: nanoid(),
-    readonly: false,
-    innerValue: name,
-  }))
-  gridTopMidLeft.value = expectedValues.gridTopMidLeft.map((name) => ({
-    id: nanoid(),
-    readonly: false,
-    innerValue: name,
-  }))
-  gridTopMidRight.value = expectedValues.gridTopMidRight.map((name) => ({
-    id: nanoid(),
-    innerValue: name,
-    readonly: false,
-  }))
-  gridTopRight.value = expectedValues.gridTopRight.map((name) => ({
-    id: nanoid(),
-    innerValue: name,
-    readonly: false,
-  }))
-  gridMidLeft.value = expectedValues.gridMidLeft.map((name) => ({
-    id: nanoid(),
-    innerValue: name,
-    readonly: false,
-  }))
-  gridBottomLeft.value = expectedValues.gridBottomLeft.map((name) => ({
-    id: nanoid(),
-    readonly: false,
-    innerValue: name,
-  }))
 }
 </script>
 
@@ -162,60 +135,113 @@ function developerFunctionFillAllExpectedValues() {
           <CustomIconSvg src="window" />
           <CustomIconSvg src="window" />
         </div>
-        <input
-          v-for="(slot, i) in gridTopLeft"
-          :key="slot.id"
-          class="grid-slot"
-          type="text"
-          :value="slot.innerValue"
-          :readonly="slot.readonly"
-          @input="(e) => changeValuesInGridSlots(e, i, 'TopLeft')"
-        />
+        <div v-for="slot in gridTopLeft" :key="slot.id">
+          <input
+            type="text"
+            class="grid-slot"
+            :value="slot.innerValue"
+            readonly
+            v-if="slot.readonly"
+          />
+          <draggable
+            v-else
+            class="grid-slot-draggable"
+            :list="slot.list"
+            group="people"
+            :data-list-id="slot.innerValue"
+            itemKey="name"
+            @add="onAdd"
+          >
+            <template #item="{ element }">
+              <div class="list-group-item">{{ element.name }}</div>
+            </template>
+          </draggable>
+        </div>
       </div>
       <div class="grid">
         <div class="window-wrapper">
           <CustomIconSvg src="window" />
           <CustomIconSvg src="window" />
         </div>
-        <input
-          v-for="(slot, i) in gridTopMidLeft"
-          :key="slot.id"
-          class="grid-slot"
-          type="text"
-          :value="slot.innerValue"
-          :readonly="slot.readonly"
-          @input="(e) => changeValuesInGridSlots(e, i, 'TopMidLeft')"
-        />
+        <div v-for="slot in gridTopMidLeft" :key="slot.id">
+          <input
+            type="text"
+            class="grid-slot"
+            :value="slot.innerValue"
+            readonly
+            v-if="slot.readonly"
+          />
+          <draggable
+            v-else
+            class="grid-slot-draggable"
+            :list="slot.list"
+            :data-list-id="slot.innerValue"
+            group="people"
+            itemKey="name"
+            @add="onAdd"
+          >
+            <template #item="{ element }">
+              <div class="list-group-item">{{ element.name }}</div>
+            </template>
+          </draggable>
+        </div>
       </div>
       <div class="grid">
         <div class="window-wrapper">
           <CustomIconSvg src="window" />
           <CustomIconSvg src="window" />
         </div>
-        <input
-          v-for="(slot, i) in gridTopMidRight"
-          :key="slot.id"
-          class="grid-slot"
-          type="text"
-          :value="slot.innerValue"
-          :readonly="slot.readonly"
-          @input="(e) => changeValuesInGridSlots(e, i, 'TopMidRight')"
-        />
+
+        <div v-for="slot in gridTopMidRight" :key="slot.id">
+          <input
+            type="text"
+            class="grid-slot"
+            :value="slot.innerValue"
+            readonly
+            v-if="slot.readonly"
+          />
+          <draggable
+            v-else
+            class="grid-slot-draggable"
+            :list="slot.list"
+            :data-list-id="slot.innerValue"
+            group="people"
+            itemKey="name"
+            @add="onAdd"
+          >
+            <template #item="{ element }">
+              <div class="list-group-item">{{ element.name }}</div>
+            </template>
+          </draggable>
+        </div>
       </div>
       <div class="grid">
         <div class="window-wrapper">
           <CustomIconSvg src="window" />
           <CustomIconSvg src="window" />
         </div>
-        <input
-          v-for="(slot, i) in gridTopRight"
-          :key="slot.id"
-          class="grid-slot"
-          type="text"
-          :value="slot.innerValue"
-          :readonly="slot.readonly"
-          @input="(e) => changeValuesInGridSlots(e, i, 'TopRight')"
-        />
+        <div v-for="slot in gridTopRight" :key="slot.id">
+          <input
+            type="text"
+            class="grid-slot"
+            :value="slot.innerValue"
+            readonly
+            v-if="slot.readonly"
+          />
+          <draggable
+            v-else
+            class="grid-slot-draggable"
+            :list="slot.list"
+            :data-list-id="slot.innerValue"
+            group="people"
+            itemKey="name"
+            @add="onAdd"
+          >
+            <template #item="{ element }">
+              <div class="list-group-item">{{ element.name }}</div>
+            </template>
+          </draggable>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -225,15 +251,28 @@ function developerFunctionFillAllExpectedValues() {
             <CustomIconSvg src="window" />
             <CustomIconSvg src="window" />
           </div>
-          <input
-            v-for="(slot, i) in gridMidLeft"
-            :key="slot.id"
-            class="grid-slot"
-            type="text"
-            :value="slot.innerValue"
-            :readonly="slot.readonly"
-            @input="(e) => changeValuesInGridSlots(e, i, 'MidLeft')"
-          />
+          <div v-for="slot in gridMidLeft" :key="slot.id">
+            <input
+              type="text"
+              class="grid-slot"
+              :value="slot.innerValue"
+              readonly
+              v-if="slot.readonly"
+            />
+            <draggable
+              v-else
+              class="grid-slot-draggable"
+              :list="slot.list"
+              :data-list-id="slot.innerValue"
+              group="people"
+              itemKey="name"
+              @add="onAdd"
+            >
+              <template #item="{ element }">
+                <div class="list-group-item">{{ element.name }}</div>
+              </template>
+            </draggable>
+          </div>
         </div>
         <div class="grid" style="padding: 40px 20px 20px 80px">
           <div class="window-wrapper">
@@ -241,21 +280,47 @@ function developerFunctionFillAllExpectedValues() {
             <CustomIconSvg src="window" />
           </div>
           <div class="coffee-wrapper">
-            <!-- <span>קפה</span> -->
             <CustomIconSvg src="coffee-machine" />
           </div>
-          <input
-            v-for="(slot, i) in gridBottomLeft"
-            :key="slot.id"
-            class="grid-slot"
-            type="text"
-            :value="slot.innerValue"
-            :readonly="slot.readonly"
-            @input="(e) => changeValuesInGridSlots(e, i, 'BottomLeft')"
-          />
+          <div v-for="slot in gridBottomLeft" :key="slot.id">
+            <input
+              type="text"
+              class="grid-slot"
+              :value="slot.innerValue"
+              readonly
+              v-if="slot.readonly"
+            />
+            <draggable
+              v-else
+              class="grid-slot-draggable"
+              :list="slot.list"
+              :data-list-id="slot.innerValue"
+              group="people"
+              itemKey="name"
+              @add="onAdd"
+            >
+              <template #item="{ element }">
+                <div class="list-group-item">{{ element.name }}</div>
+              </template>
+            </draggable>
+          </div>
         </div>
       </div>
       <div class="row-right">
+        <div class="name-bank">
+          <h3>שמות</h3>
+          <draggable
+            class="list-group"
+            :list="list1"
+            data-list-id="list1"
+            group="people"
+            itemKey="name"
+          >
+            <template #item="{ element }">
+              <div class="list-group-item">{{ element.name }}</div>
+            </template>
+          </draggable>
+        </div>
         <div class="text">
           <p>רמזים:</p>
           <ol>
@@ -302,7 +367,8 @@ function developerFunctionFillAllExpectedValues() {
   background-color: rgb(171 255 255);
   background-blend-mode: darken;
 }
-.grid-slot {
+.grid-slot,
+.grid-slot-draggable {
   width: 100px;
   height: 40px;
   border: 1px solid #ccc;
@@ -312,6 +378,9 @@ function developerFunctionFillAllExpectedValues() {
   align-items: center;
   justify-content: center;
   text-align: center;
+  background-color: white;
+  user-select: none;
+  font-size: medium;
 }
 /*
 .grid-slot input {
@@ -338,19 +407,37 @@ function developerFunctionFillAllExpectedValues() {
   left: 10px;
 }
 
-.window-wrapper span,
-.coffee-wrapper span {
-  background-color: #fff;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
 .text {
   direction: rtl;
   text-wrap: balance;
 }
 .text p {
   margin-bottom: 1rem;
+}
+
+.list-group {
+  user-select: none;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-width: 80px;
+  min-height: 40px;
+  background: white;
+  /* direction: rtl; */
+}
+.list-group-item {
+  direction: rtl;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  cursor: move;
+}
+
+.name-bank h3{
+  direction: rtl;
 }
 </style>
 

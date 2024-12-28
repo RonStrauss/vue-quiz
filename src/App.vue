@@ -21,9 +21,9 @@ const title = computed(() => {
     case '1':
       return 'SaaS Platform mish-mash'
     case '2':
-      return 'החידה השלישית'
+      return 'Walk Down Memory Lane'
     case '3':
-      return 'החידה הרביעית'
+      return 'The Color Of Truth'
     default:
       return 'ניצחתם!'
   }
@@ -34,8 +34,6 @@ const instructions = computed(() => {
     case '0':
       return ''
     case '1':
-      //   return `  בואו ניקח את שיתוף הפעולה צעד אחד קדימה. החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות במקומות
-      // המתאימים להם כדי לעבור לשלב הבא.`
       return `בואו נעשה קצת בלגן!!! החלטתי לערבב את כל החדרים. עכשיו זה הזמן לארגון מחדש. אבל אתם לא
             חושבים שזה יהיה כל כך קל...`
     case '2':

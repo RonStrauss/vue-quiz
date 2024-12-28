@@ -21,6 +21,7 @@ watchEffect(async () => {
 <style scoped>
 img {
   width: 50px;
+  user-select: none;
 }
 
 .window {
