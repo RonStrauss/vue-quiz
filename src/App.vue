@@ -12,6 +12,8 @@ function handleChangePage(newPage: typeof currentPage.value) {
   currentPage.value = newPage
 }
 
+const isDevelopment = import.meta.env.VITE_DEVELOPMENT === 'true'
+
 const title = computed(() => {
   switch (currentPage.value) {
     case '0':
@@ -37,10 +39,12 @@ const title = computed(() => {
     <ThirdPage v-else-if="currentPage === '2'" @change-page="handleChangePage" />
     <FourthPage v-else-if="currentPage === '3'" @change-page="handleChangePage" />
     <FifthPage v-else-if="currentPage === '4'" />
-    <button @click="() => handleChangePage('1')">SecondPage</button>
-    <button  @click="() => handleChangePage('2')">ThirdPage</button>
-    <button  @click="() => handleChangePage('3')">FourthPage</button>
-    <button  @click="() => handleChangePage('4')">FifthPage</button>
+    <template v-if="isDevelopment">
+      <button @click="() => handleChangePage('1')">SecondPage</button>
+      <button @click="() => handleChangePage('2')">ThirdPage</button>
+      <button @click="() => handleChangePage('3')">FourthPage</button>
+      <button @click="() => handleChangePage('4')">FifthPage</button>
+    </template>
   </main>
 </template>
 
