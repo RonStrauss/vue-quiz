@@ -205,7 +205,7 @@ const questions: Array<{ q: string; t: Icons; f: Icons }> = [
     f: 'hurricane-alt',
   },
   { q: 'רן הוא העובד הכי חדש בקבוצה', t: 'hashtag', f: 'overline' },
-  { q: 'כיום יש x פלטפורמות בכל חשבונות פרודקשן', t: 'clock-eight', f: 'cube-alt-2' },
+  { q: 'כיום יש 35 פלטפורמות בכל חשבונות פרודקשן', t: 'clock-eight', f: 'cube-alt-2' },
   {
     q: 'הנר השמיני בחנוכייה נקרא "שמש" ומשתמשים בו כדי להדליק את שאר הנרות',
     t: 'sigma',
