@@ -9,6 +9,8 @@ function changePage() {
   emit('changePage', '2')
 }
 
+const isDevelopment = import.meta.env.VITE_DEVELOPMENT === 'true'
+
 // LTR
 const expectedValues = {
   gridTopLeft: ['מיכאל', 'עמית', 'ליאור', 'מקסים'],
@@ -256,13 +258,11 @@ function developerFunctionFillAllExpectedValues() {
       <div class="row-right">
         <div class="text">
           <p>
-            בואו ניקח את שיתוף הפעולה צעד אחד קדימה.
-החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות במקומות המתאימים להם כדי לעבור לשלב הבא.
+            בואו ניקח את שיתוף הפעולה צעד אחד קדימה. החלטתי לערבב את החדרים מחדש. מקמו את חברי הצוות
+            במקומות המתאימים להם כדי לעבור לשלב הבא.
           </p>
           <p>
-            בואו נעשה קצת בלגן!!!
-            החלטתי לערבב את כל החדרים.
-             עכשיו זה הזמן לארגון מחדש. אבל אתם לא
+            בואו נעשה קצת בלגן!!! החלטתי לערבב את כל החדרים. עכשיו זה הזמן לארגון מחדש. אבל אתם לא
             חושבים שזה יהיה כל כך קל...
           </p>
           <ol>
@@ -273,7 +273,7 @@ function developerFunctionFillAllExpectedValues() {
     </div>
   </div>
 
-  <button @click="developerFunctionFillAllExpectedValues">המשך</button>
+  <button v-if="isDevelopment" @click="developerFunctionFillAllExpectedValues">המשך</button>
 </template>
 
 <style scoped>
